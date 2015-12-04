@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_acct"
+            android:icon="@android:drawable/sym_action_chat"
+            android:title="Accounts" />
+        <item
+            android:id="@+id/nav_inc"
+            android:title="Income" />
+        <item
+            android:id="@+id/nav_exp"
+            android:title="Expense" />
+        <item
+            android:id="@+id/nav_fut_exp"
+            android:title="Future Expense" />
+        <item
+            android:id="@+id/nav_rep"
+            android:title="Review Report" />
+        <item
+            android:id="@+id/nav_cat"
+            android:title="Category" />
+        <item
+            android:id="@+id/nav_set"
+            android:title="Setting" />
+        <item
+            android:id="@+id/nav_back"
+            android:title="backup" />
+    </group>
+</menu>
