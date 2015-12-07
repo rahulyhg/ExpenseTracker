@@ -6,12 +6,14 @@ import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by Krush on 10-Nov-15.
  */
 public class DBHelper extends SQLiteOpenHelper {
 
+    public static final String TAG = "DBHelper";
     public static final String DATABASE_NAME = "Expense.db";
     //Defining ACCOUNT Table
     public static final String ACCOUNT_TABLE_NAME = "account";
@@ -36,13 +38,14 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String ECATEGORY_COLUMN_CONSTANT = "constant"; // Optional
     public static final String ECATEGORY_COLUMN_VARIABLE = "variable"; // Optional
     //Defining Income Table
+    public static long AUTO_ID;
     public static final String INCOME_TABLE_NAME = "income";
     public static final String INCOME_COLUMN_ID = "_id";
     public static final String INCOME_COLUMN_AMOUNT = "amount";
     public static final String INCOME_COLUMN_IMAGE = "image";
     public static final String INCOME_COLUMN_TITLE = "title";
-    public static final String INCOME_COLUMN_CATEGORY = "category";
-    public static final String INCOME_COLUMN_ACCOUNT = "account";
+    public static final String INCOME_COLUMN_CATEGORY = "category_id";
+    public static final String INCOME_COLUMN_ACCOUNT = "account_id";
     public static final String INCOME_COLUMN_DATE = "date";
 
 
@@ -267,7 +270,8 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(INCOME_COLUMN_ACCOUNT, account);
         contentValues.put(INCOME_COLUMN_CATEGORY, category);
         contentValues.put(INCOME_COLUMN_DATE, date);
-        db.insert(INCOME_TABLE_NAME, null, contentValues);
+        Log.e(TAG,account+"."+category);
+        AUTO_ID = db.insert(INCOME_TABLE_NAME, null, contentValues);
         return true;
     }
 
@@ -301,7 +305,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Cursor getAllIncomes() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME, null);
+        /*Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME + " ic join " + ACCOUNT_TABLE_NAME
+                        + " ac on ic." + INCOME_COLUMN_ACCOUNT + " = ac." + ACCOUNT_COLUMN_ID + " join " +
+                        ICATEGORY_TABLE_NAME + " cat on ic." + INCOME_COLUMN_CATEGORY + " = cat." + ICATEGORY_COLUMN_ID + ";",
+                null);*/
+        Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME + " join " + ACCOUNT_TABLE_NAME
+                        + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " join " +
+                        ICATEGORY_TABLE_NAME + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." + ICATEGORY_COLUMN_ID + ";",
+                null);
+        Log.e(TAG, "SELECT * FROM " + INCOME_TABLE_NAME + " join " + ACCOUNT_TABLE_NAME
+                + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " join " +
+                ICATEGORY_TABLE_NAME + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." + ICATEGORY_COLUMN_ID + ";");
         return res;
     }
 

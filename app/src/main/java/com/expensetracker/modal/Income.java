@@ -10,21 +10,49 @@ public class Income {
     public byte[] image;
     public String title;
     public int account;
+    public String account_name;
     public int category;
+    public String category_name;
     public String date;
 
-    public Income(float amount, long id, byte[] image, String title, int account, int category, String date) {
+    public Income(float amount, long id, byte[] image, String title, int account, String account_name, int category, String category_name, String date) {
         this.amount = amount;
         this.id = id;
         this.image = image;
         this.title = title;
         this.account = account;
+        this.account_name = account_name;
         this.category = category;
+        this.category_name = category_name;
         this.date = date;
     }
 
     public Income() {
 
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAccount_name() {
+        return account_name;
+    }
+
+    public void setAccount_name(String account_name) {
+        this.account_name = account_name;
+    }
+
+    public String getCategory_name() {
+        return category_name;
+    }
+
+    public void setCategory_name(String category_name) {
+        this.category_name = category_name;
     }
 
     public float getAmount() {

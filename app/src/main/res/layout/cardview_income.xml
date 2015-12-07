@@ -62,6 +62,14 @@
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
+                    android:id="@+id/tv_income_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="Account"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
+                <TextView
                     android:id="@+id/tv_income_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

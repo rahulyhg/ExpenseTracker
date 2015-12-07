@@ -136,9 +136,13 @@ public class AccountFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_account, null);
 
         AdView adView = (AdView) root.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+        if (NetworkState.getNetworkState(getActivity())) {
+            adView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .setRequestAgent("android_studio:ad_template").build();
+            adView.loadAd(adRequest);
+        } else
+            adView.setVisibility(View.GONE);
 
         mRecyclerView = (RecyclerView) root.findViewById(R.id.rv_account);
         fab = (FloatingActionButton) root.findViewById(R.id.fab);
