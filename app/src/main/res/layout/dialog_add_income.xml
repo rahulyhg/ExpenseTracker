@@ -35,6 +35,18 @@
         /
     </LinearLayout>
 
+    <Spinner
+        android:id="@+id/spn_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Account Spinner" />
+
+    <Spinner
+        android:id="@+id/spn_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Category Spinner" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_et_amount"
         android:layout_width="match_parent"
@@ -47,18 +59,6 @@
             android:hint="Enter Amount"
             android:inputType="number" />
     </android.support.design.widget.TextInputLayout>
-
-    <Spinner
-        android:id="@+id/spn_category"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Category Spinner" />
-
-    <Spinner
-        android:id="@+id/spn_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Account Spinner" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_et_date"

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,11 +40,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Krush on 04-Dec-15.
@@ -53,6 +60,11 @@ public class IncomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "FragmentIncome";
+    private static final int THIS_MONTH = 0;
+    private static final int LAST_MONTH = 1;
+    private static final int LAST3MONTH = 3;
+    private static final int LAST6MONTH = 6;
+    private static int SPINNER_SELECTED;
     private DBHelper dbhelper;
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
@@ -130,16 +142,81 @@ public class IncomeFragment extends Fragment {
         }
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_category, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_spinner);
+        Spinner spinner_menu = (Spinner) MenuItemCompat.getActionView(item);
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("Current Month");
+        list.add("Last Month");
+        list.add("Last 3 Month");
+        list.add("Last 6 Month");
+
+        CustomSpinnerAdapter spinnerAdapter = new CustomSpinnerAdapter(getActivity(), list);
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_dropdown_item,list);
+        spinner_menu.setAdapter(spinnerAdapter);
+
+        spinner_menu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        SPINNER_SELECTED = THIS_MONTH;
+                        // Showing selected spinner item
+                        listIncome = getListIncome(THIS_MONTH);
+
+                        isEmpty();
+
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_category);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                        Toast.makeText(getActivity(), "This Month",
+                                Toast.LENGTH_LONG).show();
+
+                        break;
+
+                    case 1:
+                        SPINNER_SELECTED = LAST_MONTH;
+                        // Showing selected spinner item
+                        listIncome = getListIncome(LAST_MONTH);
+
+                        isEmpty();
+
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_category);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                        Toast.makeText(getActivity(), "Last Month",
+                                Toast.LENGTH_LONG).show();
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_income, null);
 
         AdView adView = (AdView) root.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
-
+        if (NetworkState.getNetworkState(getActivity())) {
+            adView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .setRequestAgent("android_studio:ad_template").build();
+            adView.loadAd(adRequest);
+        } else
+            adView.setVisibility(View.GONE);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.rv_income);
         fab = (FloatingActionButton) root.findViewById(R.id.fab);
         emptyView = (TextView) root.findViewById(R.id.empty_view);
@@ -147,7 +224,7 @@ public class IncomeFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
 
-        listIncome = getListIncome();
+        listIncome = getListIncome(THIS_MONTH);
 
         isEmpty();
 
@@ -176,12 +253,11 @@ public class IncomeFragment extends Fragment {
     }
 
     //Get All Account info from our Database
-    private List<Income> getListIncome() {
+    private List<Income> getListIncome(int month) {
         dbhelper = new DBHelper(getActivity());
         listIncome = new ArrayList<>();
-        Cursor c = dbhelper.getAllIncomes();
-        if (c.moveToNext()) {
-            c.moveToFirst();
+        Cursor c = dbhelper.getAllIncomes(month);
+        if (c.moveToFirst()) {
             do {
                 Income income = new Income();
                 income.setId(c.getInt(c.getColumnIndex(DBHelper.INCOME_TABLE_NAME + "." + DBHelper.INCOME_COLUMN_ID)));
@@ -193,7 +269,7 @@ public class IncomeFragment extends Fragment {
                 income.setCategory_name(c.getString(c.getColumnIndex(DBHelper.ICATEGORY_TABLE_NAME + "." + DBHelper.ICATEGORY_COLUMN_NAME)));
                 income.setCategory(c.getInt(c.getColumnIndex(DBHelper.INCOME_COLUMN_CATEGORY)));
                 income.setDate(c.getString(c.getColumnIndex(DBHelper.INCOME_TABLE_NAME + "." + DBHelper.INCOME_COLUMN_DATE)));
-                Log.e(TAG,income.id + income.title + income.account+ income.account_name + income.category_name);
+                Log.e(TAG, income.id + income.title + income.account + income.account_name + income.category_name);
                 listIncome.add(income);
             }
             while (c.moveToNext());
@@ -268,11 +344,10 @@ public class IncomeFragment extends Fragment {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-
         spinner_acount.setSelection(0);
         spinner_category.setSelection(0);
 
-        initSpinner();
+        initSpinner(0, 0, 0);
 
         date.setText(day + "-" + (month + 1) + "-" + year);
         calender_image.setOnClickListener(new View.OnClickListener() {
@@ -317,10 +392,11 @@ public class IncomeFragment extends Fragment {
 
     }
 
-    private void initSpinner() {
+    private void initSpinner(int operation, int account, int category) { // operation =0 for insert, operation=1 for update
         final ArrayList<HashMap<String, String>> listAccount = new ArrayList<>();
         dbhelper = new DBHelper(getActivity());
 
+        int accountSelection = 0, categorySelection = 0;
         HashMap<String, String> accountMap = new HashMap<>();
         accountMap.put("id", "0");
         accountMap.put("name", "Select Account");
@@ -332,6 +408,10 @@ public class IncomeFragment extends Fragment {
                 accountMap = new HashMap<>();
                 accountMap.put("id", String.valueOf(c.getInt(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_ID))));
                 accountMap.put("name", c.getString(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_NAME)));
+                if (operation == 1) {
+                    if (c.getInt(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_ID)) == account)
+                        accountSelection = c.getPosition()+1;
+                }
                 listAccount.add(accountMap);
             } while (c.moveToNext());
         }
@@ -349,19 +429,26 @@ public class IncomeFragment extends Fragment {
 
             }
         });
+        spinner_acount.setSelection(accountSelection);
 
         final ArrayList<HashMap<String, String>> listCategory = new ArrayList<>();
         HashMap<String, String> categoryMap = new HashMap<>();
         categoryMap.put("id", "0");
         categoryMap.put("name", "Select Category");
+        categoryMap.put("def", "0");
         listCategory.add(categoryMap);
         Cursor c1 = dbhelper.getAllCategoriesI();
         if (c1.moveToNext()) {
             c1.moveToFirst();
             do {
                 categoryMap = new HashMap<>();
-                categoryMap.put("id", String.valueOf(c1.getInt(c.getColumnIndex(DBHelper.ICATEGORY_COLUMN_ID))));
+                categoryMap.put("id", String.valueOf(c1.getInt(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_ID))));
                 categoryMap.put("name", c1.getString(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_NAME)));
+                categoryMap.put("def", String.valueOf(c1.getFloat(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_DEFVAL))));
+                if (operation == 1) {
+                    if (c1.getInt(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_ID)) == category)
+                        categorySelection = c1.getPosition()+1;
+                }
                 listCategory.add(categoryMap);
             } while (c1.moveToNext());
         }
@@ -372,6 +459,7 @@ public class IncomeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 categoryID = Integer.parseInt(listCategory.get(position).get("id"));
                 categoryName = listCategory.get(position).get("name").toString();
+                amount.setText(listCategory.get(position).get("def").toString());
             }
 
             @Override
@@ -379,6 +467,8 @@ public class IncomeFragment extends Fragment {
 
             }
         });
+        spinner_category.setSelection(categorySelection);
+        Log.e(TAG,categorySelection+":"+accountSelection);
     }
 
     // Update Income information inside our Account Table
@@ -409,10 +499,7 @@ public class IncomeFragment extends Fragment {
         else
             image.setImageBitmap(DBBitmapUtility.getImage(c.getBlob(c.getColumnIndex(DBHelper.INCOME_COLUMN_IMAGE))));
 
-        spinner_acount.setSelection(0);
-        spinner_category.setSelection(0);
-
-        initSpinner();
+        initSpinner(1, c.getInt(c.getColumnIndex(DBHelper.INCOME_COLUMN_ACCOUNT)), c.getInt(c.getColumnIndex(DBHelper.INCOME_COLUMN_CATEGORY)));
         builder.setTitle("Update Income");
         builder.setCancelable(true);
         builder.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
@@ -521,10 +608,10 @@ public class IncomeFragment extends Fragment {
             Income income = incomes.get(position);
             holder.incomeTitle.setText(income.title);
             holder.incomeId.setText(String.valueOf(income.id));
-            holder.incomeAmount.setText("Amount : "+String.valueOf(income.amount));
-            holder.incomeAccount.setText("Account : "+income.account_name);
-            holder.incomeCategory.setText("Category : "+income.category_name);
-            holder.incomeDate.setText("Date : "+String.valueOf(income.date));
+            holder.incomeAmount.setText("Amount : " + String.valueOf(income.amount));
+            holder.incomeAccount.setText("Account : " + income.account_name);
+            holder.incomeCategory.setText("Category : " + income.category_name);
+            holder.incomeDate.setText("Date : " + String.valueOf(income.date));
             if (income.image == null)
                 holder.incomePhoto.setImageResource(R.drawable.ic_profile);
             else
@@ -620,18 +707,27 @@ public class IncomeFragment extends Fragment {
                 case 0: // for inserting
                     if (title.getText().toString().trim().equalsIgnoreCase("") ||
                             title.getText().toString().trim().equalsIgnoreCase(null)) {
-                        error.setText("Please Enter Category Name ! ! !");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Enter Income Name ! ! !");
                     } else if (amount.getText().toString().trim().equalsIgnoreCase("") ||
                             amount.getText().toString().trim().equalsIgnoreCase(null)) {
-                        error.setText("Please Enter Category Description ! ! !");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Enter Income Amount ! ! !");
                     } else if (spinner_acount.getSelectedItemPosition() < 1) {
-                        error.setText("Please Add Account first");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Select / Insert Account ! ! !");
                     } else if (spinner_category.getSelectedItemPosition() < 1) {
-                        error.setText("Please Add Category first");
-                    }  else {
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Select / Insert Category ! ! !");
+                    } else {
                         Income dataToAdd = null;
+                        error.setVisibility(View.GONE);
                         if (IMAGE_SET) {
-
+                            dbhelper.insertIncome(Float.parseFloat(amount.getText().toString().trim()),
+                                    title.getText().toString().trim(), imageArray,
+                                    accountID, categoryID, date.getText().toString());
+                            dataToAdd = new Income(Float.parseFloat(amount.getText().toString().trim()), DBHelper.AUTO_ID,
+                                    imageArray, title.getText().toString().trim(), accountID, accountName, categoryID, categoryName, date.getText().toString());
                         } else {
                             dbhelper.insertIncome(Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), null,
@@ -646,19 +742,23 @@ public class IncomeFragment extends Fragment {
                 case 1: // for updating
                     if (title.getText().toString().trim().equalsIgnoreCase("") ||
                             title.getText().toString().trim().equalsIgnoreCase(null)) {
-                        error.setText("Please Enter Category Name ! ! !");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Enter Income Name ! ! !");
                     } else if (amount.getText().toString().trim().equalsIgnoreCase("") ||
                             amount.getText().toString().trim().equalsIgnoreCase(null)) {
-                        error.setText("Please Enter Category Description ! ! !");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Enter Income Amount ! ! !");
                     } else if (spinner_acount.getSelectedItemPosition() < 1) {
-                        error.setText("Please Add Account first");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Select / Insert Account ! ! !");
                     } else if (spinner_category.getSelectedItemPosition() < 1) {
-                        error.setText("Please Add Category first");
+                        error.setVisibility(View.VISIBLE);
+                        error.setText("Please Select / Insert Category ! ! !");
                     } else {
                         Income dataToAdd;
-                        error.setVisibility(View.INVISIBLE);
+                        error.setVisibility(View.GONE);
                         if (IMAGE_SET) {
-                            dbhelper.updateIncomeWithImage(id,Float.parseFloat(amount.getText().toString().trim()),
+                            dbhelper.updateIncomeWithImage(id, Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), imageArray,
                                     accountID, categoryID, date.getText().toString());
                             dataToAdd = listIncome.get(position);
@@ -668,7 +768,7 @@ public class IncomeFragment extends Fragment {
                             dataToAdd.setDate(date.getText().toString());
                             dataToAdd.setImage(imageArray);
                         } else {
-                            dbhelper.updateIncomeWithImage(id,Float.parseFloat(amount.getText().toString().trim()),
+                            dbhelper.updateIncomeWithImage(id, Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), null,
                                     accountID, categoryID, date.getText().toString());
                             dataToAdd = listIncome.get(position);

@@ -17,36 +17,36 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Expense.db";
     //Defining ACCOUNT Table
     public static final String ACCOUNT_TABLE_NAME = "account";
-    public static final String ACCOUNT_COLUMN_ID = "_id";
-    public static final String ACCOUNT_COLUMN_NAME = "name";
-    public static final String ACCOUNT_COLUMN_IMAGE = "image"; //Optional
-    public static final String ACCOUNT_COLUMN_SELECTED = "selected";
+    public static final String ACCOUNT_COLUMN_ID = "account_id";
+    public static final String ACCOUNT_COLUMN_NAME = "account_name";
+    public static final String ACCOUNT_COLUMN_IMAGE = "account_image"; //Optional
+    public static final String ACCOUNT_COLUMN_SELECTED = "account_selected";
     //Defining Category Income Table
     public static final String ICATEGORY_TABLE_NAME = "i_category";
-    public static final String ICATEGORY_COLUMN_ID = "_id";
-    public static final String ICATEGORY_COLUMN_NAME = "name";
-    public static final String ICATEGORY_COLUMN_IMAGE = "image"; //Optional
-    public static final String ICATEGORY_COLUMN_DESC = "description"; //Optional
-    public static final String ICATEGORY_COLUMN_DEFVAL = "def_value"; //Optional
+    public static final String ICATEGORY_COLUMN_ID = "i_id";
+    public static final String ICATEGORY_COLUMN_NAME = "i_name";
+    public static final String ICATEGORY_COLUMN_IMAGE = "i_image"; //Optional
+    public static final String ICATEGORY_COLUMN_DESC = "i_description"; //Optional
+    public static final String ICATEGORY_COLUMN_DEFVAL = "i_def_value"; //Optional
     //Defining Category Expense Table
     public static final String ECATEGORY_TABLE_NAME = "e_category";
-    public static final String ECATEGORY_COLUMN_ID = "_id";
-    public static final String ECATEGORY_COLUMN_NAME = "name";
-    public static final String ECATEGORY_COLUMN_IMAGE = "image"; //Optional
-    public static final String ECATEGORY_COLUMN_DESC = "description"; //Optional
-    public static final String ECATEGORY_COLUMN_DEFVAL = "def_value"; //Optional
-    public static final String ECATEGORY_COLUMN_CONSTANT = "constant"; // Optional
-    public static final String ECATEGORY_COLUMN_VARIABLE = "variable"; // Optional
+    public static final String ECATEGORY_COLUMN_ID = "e_id";
+    public static final String ECATEGORY_COLUMN_NAME = "e_name";
+    public static final String ECATEGORY_COLUMN_IMAGE = "e_image"; //Optional
+    public static final String ECATEGORY_COLUMN_DESC = "e_description"; //Optional
+    public static final String ECATEGORY_COLUMN_DEFVAL = "e_def_value"; //Optional
+    public static final String ECATEGORY_COLUMN_CONSTANT = "e_constant"; // Optional
+    public static final String ECATEGORY_COLUMN_VARIABLE = "e_variable"; // Optional
     //Defining Income Table
     public static long AUTO_ID;
     public static final String INCOME_TABLE_NAME = "income";
-    public static final String INCOME_COLUMN_ID = "_id";
-    public static final String INCOME_COLUMN_AMOUNT = "amount";
-    public static final String INCOME_COLUMN_IMAGE = "image";
-    public static final String INCOME_COLUMN_TITLE = "title";
-    public static final String INCOME_COLUMN_CATEGORY = "category_id";
-    public static final String INCOME_COLUMN_ACCOUNT = "account_id";
-    public static final String INCOME_COLUMN_DATE = "date";
+    public static final String INCOME_COLUMN_ID = "income_id";
+    public static final String INCOME_COLUMN_AMOUNT = "income_amount";
+    public static final String INCOME_COLUMN_IMAGE = "income_image";
+    public static final String INCOME_COLUMN_TITLE = "income_title";
+    public static final String INCOME_COLUMN_CATEGORY = "income_category_id";
+    public static final String INCOME_COLUMN_ACCOUNT = "income_account_id";
+    public static final String INCOME_COLUMN_DATE = "income_date";
 
 
     private static final int DATABASE_VERSION = 3;
@@ -84,14 +84,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 INCOME_COLUMN_ID + " INTEGER PRIMARY KEY, " +
                 INCOME_COLUMN_AMOUNT + " FLOAT, " + INCOME_COLUMN_IMAGE + " BLOB, " + INCOME_COLUMN_CATEGORY + " INTEGER, " +
                 INCOME_COLUMN_TITLE + " TEXT, " + INCOME_COLUMN_ACCOUNT + " INTEGER, " +
-                INCOME_COLUMN_DATE + " TEXT)");
+                INCOME_COLUMN_DATE + " DATE )");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + ACCOUNT_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ICATEGORY_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ECATEGORY_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ECATEGORY_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + INCOME_TABLE_NAME);
 
@@ -270,7 +269,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(INCOME_COLUMN_ACCOUNT, account);
         contentValues.put(INCOME_COLUMN_CATEGORY, category);
         contentValues.put(INCOME_COLUMN_DATE, date);
-        Log.e(TAG,account+"."+category);
+        Log.e(TAG, date + "");
         AUTO_ID = db.insert(INCOME_TABLE_NAME, null, contentValues);
         return true;
     }
@@ -295,27 +294,17 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public int getIncome(String name) {
+    public Cursor getAllIncomes(int month) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + ECATEGORY_TABLE_NAME + " WHERE " +
-                ECATEGORY_COLUMN_NAME + "=?", new String[]{name});
-        res.moveToFirst();
-        return res.getInt(res.getColumnIndex(ECATEGORY_COLUMN_ID));
-    }
-
-    public Cursor getAllIncomes() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        /*Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME + " ic join " + ACCOUNT_TABLE_NAME
-                        + " ac on ic." + INCOME_COLUMN_ACCOUNT + " = ac." + ACCOUNT_COLUMN_ID + " join " +
-                        ICATEGORY_TABLE_NAME + " cat on ic." + INCOME_COLUMN_CATEGORY + " = cat." + ICATEGORY_COLUMN_ID + ";",
-                null);*/
-        Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME + " join " + ACCOUNT_TABLE_NAME
-                        + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " join " +
-                        ICATEGORY_TABLE_NAME + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." + ICATEGORY_COLUMN_ID + ";",
-                null);
-        Log.e(TAG, "SELECT * FROM " + INCOME_TABLE_NAME + " join " + ACCOUNT_TABLE_NAME
-                + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " join " +
-                ICATEGORY_TABLE_NAME + " on " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." + ICATEGORY_COLUMN_ID + ";");
+        Cursor res = db.rawQuery("SELECT * FROM " + INCOME_TABLE_NAME + " JOIN " + ACCOUNT_TABLE_NAME
+                + " ON " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " JOIN " +
+                ICATEGORY_TABLE_NAME + " ON " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." +
+                ICATEGORY_COLUMN_ID +";", null);
+        Log.e(TAG, "SELECT * FROM " + INCOME_TABLE_NAME + " JOIN " + ACCOUNT_TABLE_NAME
+                + " ON " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_ACCOUNT + " = " + ACCOUNT_TABLE_NAME + "." + ACCOUNT_COLUMN_ID + " JOIN " +
+                ICATEGORY_TABLE_NAME + " ON " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_CATEGORY + " = " + ICATEGORY_TABLE_NAME + "." +
+                ICATEGORY_COLUMN_ID + " WHERE " + INCOME_TABLE_NAME + "." + INCOME_COLUMN_DATE +
+                " BETWEEN datetime('now','-" + month + " months') AND datetime('now','localtime');");
         return res;
     }
 
