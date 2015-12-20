@@ -35,17 +35,42 @@
         /
     </LinearLayout>
 
-    <Spinner
-        android:id="@+id/spn_account"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Account Spinner" />
+        android:orientation="horizontal">
 
-    <Spinner
-        android:id="@+id/spn_category"
-        android:layout_width="wrap_content"
+        <Spinner
+            android:id="@+id/spn_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Account Spinner" />
+
+        <!--
+        <ImageView
+            android:id="@+id/iv_add_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_add" /> -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category Spinner" />
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spn_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Category Spinner" />
+        <!--
+                <ImageView
+                    android:id="@+id/iv_add_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_menu_add" /> -->
+    </LinearLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_et_amount"
@@ -74,16 +99,16 @@
                 android:id="@+id/et_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:editable="false"
                 android:layout_gravity="center"
+                android:editable="false"
                 android:ems="10"
                 android:hint="Date" />
 
             <ImageView
                 android:id="@+id/iv_calendar"
-                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:src="@android:drawable/ic_menu_my_calendar" />
         </LinearLayout>
     </android.support.design.widget.TextInputLayout>

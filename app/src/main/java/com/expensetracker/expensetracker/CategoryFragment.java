@@ -312,7 +312,7 @@ public class CategoryFragment extends Fragment {
     private void deleteIConfirmation(final String id, final int position) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Are You Sure to Delete Category ? ? ?");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -340,7 +340,7 @@ public class CategoryFragment extends Fragment {
     private void deleteEConfirmation(final String id, final int position) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Are You Sure to Delete Category ? ? ?");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -377,8 +377,14 @@ public class CategoryFragment extends Fragment {
         error = (TextView) alertView.findViewById(R.id.tv_err_msg);
 
         builder.setTitle("Insert Category");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -426,8 +432,14 @@ public class CategoryFragment extends Fragment {
         error = (TextView) alertView.findViewById(R.id.tv_err_msg);
 
         builder.setTitle("Insert Expense Category");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -485,8 +497,14 @@ public class CategoryFragment extends Fragment {
             image.setImageBitmap(DBBitmapUtility.getImage(c.getBlob(c.getColumnIndex(DBHelper.ICATEGORY_COLUMN_IMAGE))));
 
         builder.setTitle("Update Category");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -545,8 +563,14 @@ public class CategoryFragment extends Fragment {
             image.setImageBitmap(DBBitmapUtility.getImage(c.getBlob(c.getColumnIndex(DBHelper.ECATEGORY_COLUMN_IMAGE))));
 
         builder.setTitle("Update Expense Category");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

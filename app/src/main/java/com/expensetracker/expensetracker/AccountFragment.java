@@ -220,7 +220,7 @@ public class AccountFragment extends Fragment {
     private void deleteConfirmation(final String id, final int position) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Are You Sure to Delete Account ? ? ?");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -248,17 +248,23 @@ public class AccountFragment extends Fragment {
     // Insert Account information inside our Account Table
     private void insertAccount() {
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = (getActivity()).getLayoutInflater();
-        final View alertView = inflater.inflate(R.layout.dialog_add_account, null);
+        View alertView = inflater.inflate(R.layout.dialog_add_account, null);
         builder.setView(alertView);
         input_name = (TextInputLayout) alertView.findViewById(R.id.input_et_name);
         name = (EditText) alertView.findViewById(R.id.et_name);
         error = (TextView) alertView.findViewById(R.id.tv_err_msg);
 
         builder.setTitle("Insert Account");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -311,8 +317,14 @@ public class AccountFragment extends Fragment {
             image.setImageBitmap(DBBitmapUtility.getImage(c.getBlob(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_IMAGE))));
 
         builder.setTitle("Update Account");
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

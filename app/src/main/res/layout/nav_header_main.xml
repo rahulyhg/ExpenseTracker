@@ -34,6 +34,6 @@
             android:paddingLeft="16dp"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
             android:text="No Account ! ! Please Add Account"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:textAppearance="@style/Text.Title" />
     </LinearLayout>
 </LinearLayout>

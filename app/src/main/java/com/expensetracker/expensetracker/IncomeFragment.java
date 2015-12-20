@@ -40,14 +40,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Krush on 04-Dec-15.
@@ -61,15 +58,18 @@ public class IncomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "FragmentIncome";
     private static final int THIS_MONTH = 0;
-    private static final int LAST_MONTH = 1;
-    private static final int LAST3MONTH = 3;
-    private static final int LAST6MONTH = 6;
+    private static final int LAST_MONTH = -1;
+    private static final int LAST3MONTH = -3;
+    private static final int LAST6MONTH = -6;
     private static int SPINNER_SELECTED;
+    private static int accountID, categoryID;
+    private static String accountName, categoryName;
+    private static DateUtili dateUtili = new DateUtili();
     private DBHelper dbhelper;
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
     private TextView emptyView;
-    private ImageView image, calender_image;
+    private ImageView image, calender_image, add_account, add_category;
     private IncomeAdapter mAdapter;
     private byte[] imageArray = null;
     private List<Income> listIncome = new ArrayList<>();
@@ -77,9 +77,6 @@ public class IncomeFragment extends Fragment {
     private Spinner spinner_category, spinner_acount;
     private TextView error;
     private boolean IMAGE_SET;
-    private static int accountID, categoryID;
-    private static String accountName, categoryName;
-
     private OnFragmentInteractionListener mListener;
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -140,8 +137,8 @@ public class IncomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -170,12 +167,11 @@ public class IncomeFragment extends Fragment {
 
                         isEmpty();
 
-                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_category);
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_income);
                         mRecyclerView.setAdapter(mAdapter);
 
                         Toast.makeText(getActivity(), "This Month",
                                 Toast.LENGTH_LONG).show();
-
                         break;
 
                     case 1:
@@ -185,10 +181,37 @@ public class IncomeFragment extends Fragment {
 
                         isEmpty();
 
-                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_category);
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_income);
                         mRecyclerView.setAdapter(mAdapter);
 
                         Toast.makeText(getActivity(), "Last Month",
+                                Toast.LENGTH_LONG).show();
+                        break;
+
+                    case 2:
+                        SPINNER_SELECTED = LAST3MONTH;
+                        // Showing selected spinner item
+                        listIncome = getListIncome(LAST3MONTH);
+
+                        isEmpty();
+
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_income);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                        Toast.makeText(getActivity(), "Last 3 Month",
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case 3:
+                        SPINNER_SELECTED = LAST6MONTH;
+                        // Showing selected spinner item
+                        listIncome = getListIncome(LAST6MONTH);
+
+                        isEmpty();
+
+                        mAdapter = new IncomeAdapter(listIncome, R.layout.cardview_income);
+                        mRecyclerView.setAdapter(mAdapter);
+
+                        Toast.makeText(getActivity(), "Last 6 Month",
                                 Toast.LENGTH_LONG).show();
 
                         break;
@@ -217,6 +240,7 @@ public class IncomeFragment extends Fragment {
             adView.loadAd(adRequest);
         } else
             adView.setVisibility(View.GONE);
+
         mRecyclerView = (RecyclerView) root.findViewById(R.id.rv_income);
         fab = (FloatingActionButton) root.findViewById(R.id.fab);
         emptyView = (TextView) root.findViewById(R.id.empty_view);
@@ -268,8 +292,7 @@ public class IncomeFragment extends Fragment {
                 income.setAccount(c.getInt(c.getColumnIndex(DBHelper.INCOME_COLUMN_ACCOUNT)));
                 income.setCategory_name(c.getString(c.getColumnIndex(DBHelper.ICATEGORY_TABLE_NAME + "." + DBHelper.ICATEGORY_COLUMN_NAME)));
                 income.setCategory(c.getInt(c.getColumnIndex(DBHelper.INCOME_COLUMN_CATEGORY)));
-                income.setDate(c.getString(c.getColumnIndex(DBHelper.INCOME_TABLE_NAME + "." + DBHelper.INCOME_COLUMN_DATE)));
-                Log.e(TAG, income.id + income.title + income.account + income.account_name + income.category_name);
+                income.setDate(c.getLong(c.getColumnIndex(DBHelper.INCOME_TABLE_NAME + "." + DBHelper.INCOME_COLUMN_DATE)));
                 listIncome.add(income);
             }
             while (c.moveToNext());
@@ -339,6 +362,8 @@ public class IncomeFragment extends Fragment {
         spinner_acount = (Spinner) alertView.findViewById(R.id.spn_account);
         spinner_category = (Spinner) alertView.findViewById(R.id.spn_category);
         calender_image = (ImageView) alertView.findViewById(R.id.iv_calendar);
+/*        add_account = (ImageView) alertView.findViewById(R.id.iv_add_account);
+        add_category = (ImageView) alertView.findViewById(R.id.iv_add_category);*/
 
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -410,7 +435,7 @@ public class IncomeFragment extends Fragment {
                 accountMap.put("name", c.getString(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_NAME)));
                 if (operation == 1) {
                     if (c.getInt(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_ID)) == account)
-                        accountSelection = c.getPosition()+1;
+                        accountSelection = c.getPosition() + 1;
                 }
                 listAccount.add(accountMap);
             } while (c.moveToNext());
@@ -447,7 +472,7 @@ public class IncomeFragment extends Fragment {
                 categoryMap.put("def", String.valueOf(c1.getFloat(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_DEFVAL))));
                 if (operation == 1) {
                     if (c1.getInt(c1.getColumnIndex(DBHelper.ICATEGORY_COLUMN_ID)) == category)
-                        categorySelection = c1.getPosition()+1;
+                        categorySelection = c1.getPosition() + 1;
                 }
                 listCategory.add(categoryMap);
             } while (c1.moveToNext());
@@ -468,7 +493,7 @@ public class IncomeFragment extends Fragment {
             }
         });
         spinner_category.setSelection(categorySelection);
-        Log.e(TAG,categorySelection+":"+accountSelection);
+        Log.e(TAG, categorySelection + ":" + accountSelection);
     }
 
     // Update Income information inside our Account Table
@@ -493,7 +518,7 @@ public class IncomeFragment extends Fragment {
         title.setText(c.getString(c.getColumnIndex(DBHelper.INCOME_COLUMN_TITLE)));
         amount.setText(String.valueOf(c.getFloat(c.getColumnIndex(DBHelper.INCOME_COLUMN_AMOUNT))));
 
-        date.setText(c.getString(c.getColumnIndex(DBHelper.INCOME_COLUMN_DATE)));
+        date.setText(dateUtili.LongtoString(c.getLong(c.getColumnIndex(DBHelper.INCOME_COLUMN_DATE))));
         if (c.getBlob(c.getColumnIndex(DBHelper.INCOME_COLUMN_IMAGE)) == null)
             image.setImageResource(R.drawable.ic_profile);
         else
@@ -611,7 +636,8 @@ public class IncomeFragment extends Fragment {
             holder.incomeAmount.setText("Amount : " + String.valueOf(income.amount));
             holder.incomeAccount.setText("Account : " + income.account_name);
             holder.incomeCategory.setText("Category : " + income.category_name);
-            holder.incomeDate.setText("Date : " + String.valueOf(income.date));
+            holder.incomeDate.setText("Date : " + dateUtili.LongtoString(income.date));
+            Log.e(TAG, "Adapter Date : " + dateUtili.LongtoString(income.date));
             if (income.image == null)
                 holder.incomePhoto.setImageResource(R.drawable.ic_profile);
             else
@@ -725,15 +751,17 @@ public class IncomeFragment extends Fragment {
                         if (IMAGE_SET) {
                             dbhelper.insertIncome(Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), imageArray,
-                                    accountID, categoryID, date.getText().toString());
+                                    accountID, categoryID, dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd = new Income(Float.parseFloat(amount.getText().toString().trim()), DBHelper.AUTO_ID,
-                                    imageArray, title.getText().toString().trim(), accountID, accountName, categoryID, categoryName, date.getText().toString());
+                                    imageArray, title.getText().toString().trim(), accountID, accountName,
+                                    categoryID, categoryName, dateUtili.StringtoLong(date.getText().toString()));
                         } else {
                             dbhelper.insertIncome(Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), null,
-                                    accountID, categoryID, date.getText().toString());
+                                    accountID, categoryID, dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd = new Income(Float.parseFloat(amount.getText().toString().trim()), DBHelper.AUTO_ID,
-                                    imageArray, title.getText().toString().trim(), accountID, accountName, categoryID, categoryName, date.getText().toString());
+                                    imageArray, title.getText().toString().trim(), accountID, accountName,
+                                    categoryID, categoryName, dateUtili.StringtoLong(date.getText().toString()));
                         }
                         mAdapter.addItem(listIncome.size(), dataToAdd);
                         dialog.dismiss();
@@ -760,22 +788,22 @@ public class IncomeFragment extends Fragment {
                         if (IMAGE_SET) {
                             dbhelper.updateIncomeWithImage(id, Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), imageArray,
-                                    accountID, categoryID, date.getText().toString());
+                                    accountID, categoryID, dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd = listIncome.get(position);
                             dataToAdd.setAmount(Float.parseFloat(amount.getText().toString().trim()));
                             dataToAdd.setAccount_name(accountName);
                             dataToAdd.setCategory_name(categoryName);
-                            dataToAdd.setDate(date.getText().toString());
+                            dataToAdd.setDate(dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd.setImage(imageArray);
                         } else {
                             dbhelper.updateIncomeWithImage(id, Float.parseFloat(amount.getText().toString().trim()),
                                     title.getText().toString().trim(), null,
-                                    accountID, categoryID, date.getText().toString());
+                                    accountID, categoryID, dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd = listIncome.get(position);
                             dataToAdd.setAmount(Float.parseFloat(amount.getText().toString().trim()));
                             dataToAdd.setAccount_name(accountName);
                             dataToAdd.setCategory_name(categoryName);
-                            dataToAdd.setDate(date.getText().toString());
+                            dataToAdd.setDate(dateUtili.StringtoLong(date.getText().toString()));
                             dataToAdd.setImage(null);
                         }
                         listIncome.set(position, dataToAdd);

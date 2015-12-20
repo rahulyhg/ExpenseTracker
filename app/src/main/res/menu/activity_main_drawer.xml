@@ -4,31 +4,39 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
+            android:icon="@drawable/nav_home"
             android:title="Home" />
         <item
             android:id="@+id/nav_acct"
-            android:icon="@android:drawable/sym_action_chat"
+            android:icon="@drawable/nav_account"
             android:title="Accounts" />
         <item
             android:id="@+id/nav_inc"
+            android:icon="@drawable/nav_income"
             android:title="Income" />
         <item
             android:id="@+id/nav_exp"
+            android:icon="@drawable/nav_expense"
             android:title="Expense" />
         <item
             android:id="@+id/nav_fut_exp"
+            android:icon="@drawable/nav_expense"
             android:title="Future Expense" />
         <item
             android:id="@+id/nav_rep"
+            android:icon="@drawable/nav_report"
             android:title="Review Report" />
         <item
             android:id="@+id/nav_cat"
+            android:icon="@drawable/nav_category"
             android:title="Category" />
         <item
             android:id="@+id/nav_set"
+            android:icon="@drawable/nav_setting"
             android:title="Setting" />
         <item
             android:id="@+id/nav_back"
+            android:icon="@drawable/nav_backup"
             android:title="backup" />
     </group>
 </menu>

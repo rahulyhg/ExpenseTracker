@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity
         CategoryFragment.OnFragmentInteractionListener,
         AccountFragment.OnFragmentInteractionListener,
         HomeFragment.OnFragmentInteractionListener,
-        IncomeFragment.OnFragmentInteractionListener {
+        IncomeFragment.OnFragmentInteractionListener,
+        ReportFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
     private Toolbar toolbar;
@@ -141,6 +142,9 @@ public class MainActivity extends AppCompatActivity
                 fragmentClass = IncomeFragment.class;
                 break;
 
+            case R.id.nav_rep:
+                fragmentClass = ReportFragment.class;
+                break;
             case R.id.nav_set:
                 break;
         }
@@ -163,12 +167,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
+        toolbar.setTitleTextAppearance(getApplicationContext(), android.R.style.TextAppearance_DeviceDefault_Medium);
         toolbar.setTitle(mTitle);
     }
 
     @Override
     public void onFragmentInteraction(CharSequence title) {
-        mTitle = title;
         setTitle(title);
     }
 

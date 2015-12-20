@@ -1,6 +1,7 @@
 package com.expensetracker.expensetracker;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -15,7 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.TextView;
 
+import com.expensetracker.db.DBHelper;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -40,6 +43,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "FragmentHome";
+    private static final int THIS_MONTH = 0;
+    private static final int LAST_MONTH = -1;
+    private static final int LAST3MONTH = -3;
+    private static final int LAST6MONTH = -6;
+    private static float total_income, total_expense;
     protected String[] mParties = new String[]{
             "Expense", "Balance"
     };
@@ -47,7 +55,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private DBHelper dbhelper;
     private PieChart mChart;
+    private TextView balance;
 //    private SeekBar mSeekBarX, mSeekBarY;
 //    private TextView tvX, tvY;
 
@@ -118,6 +128,17 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        balance = (TextView) root.findViewById(R.id.tv_balance);
+
+        dbhelper = new DBHelper(getActivity());
+
+        Cursor c = dbhelper.getSumIncome(THIS_MONTH);
+        c.moveToFirst();
+        total_income = c.getFloat(1);
+        c.close();
+
+        total_expense = dbhelper.getSumExpense(THIS_MONTH);
+        balance.setText("Balance : " + total_income);
         AdView adView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template").build();
@@ -187,8 +208,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         float mult = range;
 
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
-        yVals1.add(new Entry(35, 0));
-        yVals1.add(new Entry(65, 1));
+        yVals1.add(new Entry(total_expense, 0));
+        yVals1.add(new Entry(total_income, 1));
 
         // IMPORTANT: In a PieChart, no values (Entry) should have the same
         // xIndex (even if from different DataSets), since no values can be
@@ -235,7 +256,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         PieData data = new PieData(xVals, dataSet);
         data.setValueFormatter(new PercentFormatter());
         data.setValueTextSize(11f);
-        data.setValueTextColor(Color.WHITE);
+        data.setValueTextColor(Color.BLACK);
         data.setValueTypeface(tf);
         mChart.setData(data);
 
@@ -259,11 +280,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     @Override
     public void onValueSelected(Entry entry, int i, Highlight highlight) {
-        if (entry == null)
-            return;
-        Log.i("VAL SELECTED",
-                "Value: " + entry.getVal() + ", xIndex: " + entry.getXIndex()
-                        + ", DataSet index: " + i);
+
     }
 
 
@@ -272,25 +289,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         Log.i("PieChart", "nothing selected");
     }
 
-    /*
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tvX.setText("" + (mSeekBarX.getProgress() + 1));
-        tvY.setText("" + (mSeekBarY.getProgress()));
-
-        setData(mSeekBarX.getProgress(), mSeekBarY.getProgress());
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }*/
 
     /**
      * This interface must be implemented by activities that contain this
