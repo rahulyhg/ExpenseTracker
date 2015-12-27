@@ -36,6 +36,8 @@ import com.expensetracker.db.DBBitmapUtility;
 import com.expensetracker.db.DBHelper;
 import com.expensetracker.modal.CategoryExpense;
 import com.expensetracker.modal.CategoryIncome;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -209,6 +211,15 @@ public class CategoryFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
+
+        AdView adView = (AdView) root.findViewById(R.id.adView);
+        if (NetworkState.getNetworkState(getActivity())) {
+            adView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .setRequestAgent("android_studio:ad_template").build();
+            adView.loadAd(adRequest);
+        } else
+            adView.setVisibility(View.GONE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

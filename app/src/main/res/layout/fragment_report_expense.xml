@@ -11,13 +11,13 @@
         android:id="@+id/SPNcategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/adView" />
+        android:layout_alignParentTop="true" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="5dp"
         ads:adSize="BANNER"
@@ -27,6 +27,6 @@
         android:id="@+id/chart1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/adView"
         android:layout_below="@+id/SPNcategory" />
 </RelativeLayout>

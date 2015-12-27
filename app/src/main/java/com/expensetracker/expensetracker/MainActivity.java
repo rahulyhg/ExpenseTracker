@@ -183,8 +183,7 @@ public class MainActivity extends AppCompatActivity
         StringBuilder sb = new StringBuilder();
         Cursor c = db.getAllAccounts();
         int count = 0;
-        if (c.moveToNext()) {
-            c.moveToFirst();
+        if (c.moveToFirst()) {
             count++;
             image = c.getBlob(c.getColumnIndex(DBHelper.ACCOUNT_COLUMN_IMAGE));
             if (image != null)

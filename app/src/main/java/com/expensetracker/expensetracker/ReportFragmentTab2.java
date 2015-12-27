@@ -147,17 +147,16 @@ public class ReportFragmentTab2 extends Fragment {
     private void incomeByMonth() {
         dbhelper = new DBHelper(getActivity());
 
-        Cursor c = dbhelper.getSumIncome(LAST6MONTH);
-        c.moveToFirst();
-
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         ArrayList<String> xVals = new ArrayList<String>();
+        Cursor c = dbhelper.getSumIncome(LAST6MONTH);
+        if (c.moveToFirst()) {
 
-        do {
-            yVals1.add(new BarEntry(c.getFloat(1), c.getPosition()));
-            xVals.add(c.getString(0));
-        } while (c.moveToNext());
-
+            do {
+                yVals1.add(new BarEntry(c.getFloat(1), c.getPosition()));
+                xVals.add(c.getString(0));
+            } while (c.moveToNext());
+        }
         c.close();
         // IMPORTANT: In a PieChart, no values (Entry) should have the same
         // xIndex (even if from different DataSets), since no values can be

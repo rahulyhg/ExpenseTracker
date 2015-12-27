@@ -133,16 +133,22 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         dbhelper = new DBHelper(getActivity());
 
         Cursor c = dbhelper.getSumIncome(THIS_MONTH);
-        c.moveToFirst();
-        total_income = c.getFloat(1);
+        if (c.moveToFirst())
+            total_income = c.getFloat(1);
+        else
+            total_income = 10000;
         c.close();
 
         total_expense = dbhelper.getSumExpense(THIS_MONTH);
         balance.setText("Balance : " + total_income);
         AdView adView = (AdView) root.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+        if (NetworkState.getNetworkState(getActivity())) {
+            adView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .setRequestAgent("android_studio:ad_template").build();
+            adView.loadAd(adRequest);
+        } else
+            adView.setVisibility(View.GONE);
 
 /*      tvX = (TextView) root.findViewById(R.id.tvXMax);
         tvY = (TextView) root.findViewById(R.id.tvYMax);
